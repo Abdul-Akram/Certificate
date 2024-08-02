@@ -14,7 +14,7 @@
 
         html,
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif
         }
 
         body {
@@ -29,7 +29,8 @@
             padding: 1rem;
             width: 100%;
             max-width: 800px;
-            background-color: #f9f9f9;
+            background-color: rgba(254, 233, 208, 0.882);
+
         }
 
         .h_part1 {
@@ -69,6 +70,7 @@
             display: flex;
             justify-content: center;
             width: 100%;
+            overflow: auto;
         }
 
         table {
@@ -87,6 +89,8 @@
         input[type="number"] {
             width: 80%;
             padding: 0.3rem;
+            border: none;
+            background-color: rgba(254, 233, 208, 0.882);
         }
 
         button {
@@ -113,6 +117,17 @@
 
         .reset-btn:hover {
             background-color: #e53935;
+        }
+
+        #t1 tr td p:nth-child(1) {
+            font-weight: bolder;
+            width: 100%;
+            padding: .1rem;
+            color: rgb(102, 34, 0);
+        }
+
+        #t2 th {
+            color: rgb(102, 34, 0);
         }
 
         /* Media Queries for Responsive Design */
@@ -320,10 +335,15 @@
     </div>
     <script>
         function total() {
-            document.getElementById("total").innerText = value_retrieve();
-
-            let percentage = Math.round(value_retrieve() / 1000 * 100);
-            if (percentage > 50) {
+            let main_value = value_retrieve();
+            if (typeof (main_value) !== "number") {
+                alert(main_value);
+                return;
+            } else {
+                document.getElementById("total").innerText = main_value;
+            }
+            let percentage = Math.round(main_value / 10); // Corrected calculation for percentage
+            if (percentage >= 50) { // Changed comparison to 'greater than or equal to'
                 document.getElementById("result").innerText = "Pass";
             } else {
                 document.getElementById("result").innerText = "Fail";
@@ -336,38 +356,45 @@
         }
 
         function value_retrieve() {
-            let marks = document.querySelectorAll('input[name="marks_t"], input[name="marks_p"]');
-            let sum = 0;
-            marks.forEach(mark => {
-                let value = parseFloat(mark.value);
+            let theory_marks = document.querySelectorAll('input[name="marks_t"]');
+            let practical_marks = document.querySelectorAll('input[name="marks_p"]');
 
-                if (!isNaN(value)) {
+            let sum = 0;
+            let t_flag = 0;
+            let p_flag = 0;
+            theory_marks.forEach((t_mark) => {
+                let value = parseInt(t_mark.value);
+                if (!isNaN(value) && value >= 0 && value <= 80) {
                     sum += value;
+                } else {
+                    t_flag = 1;
                 }
             });
+            if (t_flag == 1) {
+                return "Invalid marks in theory subjects";
+            }
+            practical_marks.forEach((p_mark) => {
+                let value = parseInt(p_mark.value);
+                if (!isNaN(value) && value >= 0 && value <= 20) {
+                    sum += value;
+                } else {
+                    p_flag = 1;
+                }
+            });
+            if (p_flag == 1) {
+                return "Invalid marks in practical subjects";
+            }
             return sum;
         }
 
         function displaySubjectWiseTotals() {
-            const subjects = [
-                { theory: 't1', practical: 'p1', total: 'to1' },
-                { theory: 't2', practical: 'p2', total: 'to2' },
-                { theory: 't3', practical: 'p3', total: 'to3' },
-                { theory: 't4', practical: 'p4', total: 'to4' },
-                { theory: 't5', practical: 'p5', total: 'to5' },
-                { theory: 't6', practical: 'p6', total: 'to6' },
-                { theory: 't7', practical: 'p7', total: 'to7' },
-                { theory: 't8', practical: 'p8', total: 'to8' },
-                { theory: 't9', practical: 'p9', total: 'to9' },
-                { theory: 't10', practical: 'p10', total: 'to10' }
-            ];
-
-            subjects.forEach(subject => {
-                let theoryMarks = parseFloat(document.getElementById(subject.theory).value) || 0;
-                let practicalMarks = parseFloat(document.getElementById(subject.practical).value) || 0;
-                let totalMarks = theoryMarks + practicalMarks;
-                document.getElementById(subject.total).innerText = totalMarks;
-            });
+            const theoryMarks = document.querySelectorAll('input[name="marks_t"]');
+            const practicalMarks = document.querySelectorAll('input[name="marks_p"]');
+            for (let i = 0; i < theoryMarks.length; i++) {
+                const theoryValue = parseInt(theoryMarks[i].value) || 0;
+                const practicalValue = parseInt(practicalMarks[i].value) || 0;
+                document.getElementById(`to${i + 1}`).innerText = theoryValue + practicalValue;
+            }
         }
 
         function grade_calculator(percentage) {
@@ -394,10 +421,12 @@
             document.getElementById("precen").innerText = '';
             document.querySelector(".grade").innerText = '';
 
-            document.querySelectorAll('#t2 td[id^="to"]').forEach(span => {
-                span.innerText = '';
-            });
+            for (let i = 1; i <= 10; i++) {
+                document.getElementById(`to${i}`).innerText = '';
+            }
         }
+
+
     </script>
 </body>
 
